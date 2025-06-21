@@ -63,12 +63,15 @@
 | VM_VMANOMALYDEFAULT_CONFIGRELOADERMEMORY: `25Mi` <a href="#variables-vm-vmanomalydefault-configreloadermemory" id="variables-vm-vmanomalydefault-configreloadermemory">#</a><br>Deprecated: use VM_CONFIG_RELOADER_REQUEST_MEMORY instead |
 | VM_VMSINGLEDEFAULT_IMAGE: `victoriametrics/victoria-metrics` <a href="#variables-vm-vmsingledefault-image" id="variables-vm-vmsingledefault-image">#</a> |
 | VM_VMSINGLEDEFAULT_VERSION: `${VM_METRICS_VERSION}` <a href="#variables-vm-vmsingledefault-version" id="variables-vm-vmsingledefault-version">#</a> |
+| VM_VMSINGLEDEFAULT_CONFIGRELOADIMAGE: `quay.io/prometheus-operator/prometheus-config-reloader:v0.82.1` <a href="#variables-vm-vmsingledefault-configreloadimage" id="variables-vm-vmsingledefault-configreloadimage">#</a> |
 | VM_VMSINGLEDEFAULT_PORT: `8429` <a href="#variables-vm-vmsingledefault-port" id="variables-vm-vmsingledefault-port">#</a> |
 | VM_VMSINGLEDEFAULT_USEDEFAULTRESOURCES: `true` <a href="#variables-vm-vmsingledefault-usedefaultresources" id="variables-vm-vmsingledefault-usedefaultresources">#</a> |
 | VM_VMSINGLEDEFAULT_RESOURCE_LIMIT_MEM: `1500Mi` <a href="#variables-vm-vmsingledefault-resource-limit-mem" id="variables-vm-vmsingledefault-resource-limit-mem">#</a> |
 | VM_VMSINGLEDEFAULT_RESOURCE_LIMIT_CPU: `1200m` <a href="#variables-vm-vmsingledefault-resource-limit-cpu" id="variables-vm-vmsingledefault-resource-limit-cpu">#</a> |
 | VM_VMSINGLEDEFAULT_RESOURCE_REQUEST_MEM: `500Mi` <a href="#variables-vm-vmsingledefault-resource-request-mem" id="variables-vm-vmsingledefault-resource-request-mem">#</a> |
 | VM_VMSINGLEDEFAULT_RESOURCE_REQUEST_CPU: `150m` <a href="#variables-vm-vmsingledefault-resource-request-cpu" id="variables-vm-vmsingledefault-resource-request-cpu">#</a> |
+| VM_VMSINGLEDEFAULT_CONFIGRELOADERCPU: `10m` <a href="#variables-vm-vmsingledefault-configreloadercpu" id="variables-vm-vmsingledefault-configreloadercpu">#</a><br>Deprecated:: use VM_CONFIG_RELOADER_REQUEST_CPU instead |
+| VM_VMSINGLEDEFAULT_CONFIGRELOADERMEMORY: `25Mi` <a href="#variables-vm-vmsingledefault-configreloadermemory" id="variables-vm-vmsingledefault-configreloadermemory">#</a><br>Deprecated:: use VM_CONFIG_RELOADER_REQUEST_MEMORY instead |
 | VM_VMCLUSTERDEFAULT_USEDEFAULTRESOURCES: `true` <a href="#variables-vm-vmclusterdefault-usedefaultresources" id="variables-vm-vmclusterdefault-usedefaultresources">#</a> |
 | VM_VMCLUSTERDEFAULT_VMSELECTDEFAULT_IMAGE: `victoriametrics/vmselect` <a href="#variables-vm-vmclusterdefault-vmselectdefault-image" id="variables-vm-vmclusterdefault-vmselectdefault-image">#</a> |
 | VM_VMCLUSTERDEFAULT_VMSELECTDEFAULT_VERSION: `${VM_METRICS_VERSION}-cluster` <a href="#variables-vm-vmclusterdefault-vmselectdefault-version" id="variables-vm-vmclusterdefault-vmselectdefault-version">#</a> |

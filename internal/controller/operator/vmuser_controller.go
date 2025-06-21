@@ -76,7 +76,7 @@ func (r *VMUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (res
 	if !instance.DeletionTimestamp.IsZero() {
 		// need to remove finalizer and delete related resources.
 		if err := finalize.OnVMUserDelete(ctx, r, &instance); err != nil {
-			return result, fmt.Errorf("cannot remove finalizer for vmuser: %w", err)
+			return result, fmt.Errorf("cannot remove finalizer for VMUser: %w", err)
 		}
 	} else {
 		if err := finalize.AddFinalizer(ctx, r.Client, &instance); err != nil {
@@ -91,7 +91,7 @@ func (r *VMUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (res
 	if err := k8stools.ListObjectsByNamespace(ctx, r.Client, config.MustGetWatchNamespaces(), func(dst *vmv1beta1.VMAuthList) {
 		objects.Items = append(objects.Items, dst.Items...)
 	}); err != nil {
-		return result, fmt.Errorf("cannot list vmauths for vmuser: %w", err)
+		return result, fmt.Errorf("cannot list VMAuths for VMUser: %w", err)
 	}
 
 	for i := range objects.Items {
@@ -114,7 +114,7 @@ func (r *VMUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (res
 			}
 			match, err := isSelectorsMatchesTargetCRD(ctx, r.Client, &instance, item, opts)
 			if err != nil {
-				l.Error(err, "cannot match vmauth and VMUser")
+				l.Error(err, "cannot match VMAuth and VMUser")
 				continue
 			}
 			if !match {
@@ -122,7 +122,7 @@ func (r *VMUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (res
 			}
 		}
 		if err := vmauth.CreateOrUpdateConfig(ctx, r, item, &instance); err != nil {
-			return ctrl.Result{}, fmt.Errorf("cannot create or update vmauth deploy for vmuser: %w", err)
+			return ctrl.Result{}, fmt.Errorf("cannot create or update VMAuth deploy for VMUser: %w", err)
 		}
 	}
 	return

@@ -82,7 +82,7 @@ func (r *VMAlertmanagerConfigReconciler) Reconcile(ctx context.Context, req ctrl
 	if err := k8stools.ListObjectsByNamespace(ctx, r.Client, config.MustGetWatchNamespaces(), func(dst *vmv1beta1.VMAlertmanagerList) {
 		objects.Items = append(objects.Items, dst.Items...)
 	}); err != nil {
-		return result, fmt.Errorf("cannot list vmauths for vmuser: %w", err)
+		return result, fmt.Errorf("cannot list VMAlertmanagers for VMAlertmanagerConfig: %w", err)
 	}
 
 	for i := range objects.Items {
@@ -105,7 +105,7 @@ func (r *VMAlertmanagerConfigReconciler) Reconcile(ctx context.Context, req ctrl
 			}
 			match, err := isSelectorsMatchesTargetCRD(ctx, r.Client, &instance, item, opts)
 			if err != nil {
-				l.Error(err, "cannot match alertmanager against selector, probably bug")
+				l.Error(err, "cannot match VMAlertmanager against selector, probably bug")
 				continue
 			}
 			if !match {

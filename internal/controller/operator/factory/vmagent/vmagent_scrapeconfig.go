@@ -115,21 +115,21 @@ func (so *scrapeObjects) validateObjects(cr *vmv1beta1.VMAgent) {
 	})
 }
 
-// CreateOrUpdateConfigurationSecret builds scrape configuration for VMAgent
-func CreateOrUpdateConfigurationSecret(ctx context.Context, rclient client.Client, cr *vmv1beta1.VMAgent, childObject client.Object) error {
+// CreateOrUpdateScrapeConfig builds scrape configuration for VMAgent
+func CreateOrUpdateScrapeConfig(ctx context.Context, rclient client.Client, cr *vmv1beta1.VMAgent, childObject client.Object) error {
 	var prevCR *vmv1beta1.VMAgent
 	if cr.ParsedLastAppliedSpec != nil {
 		prevCR = cr.DeepCopy()
 		prevCR.Spec = *cr.ParsedLastAppliedSpec
 	}
 	ac := getAssetsCache(ctx, rclient, cr)
-	if err := createOrUpdateConfigurationSecret(ctx, rclient, cr, prevCR, childObject, ac); err != nil {
+	if err := createOrUpdateScrapeConfig(ctx, rclient, cr, prevCR, childObject, ac); err != nil {
 		return err
 	}
 	return nil
 }
 
-func createOrUpdateConfigurationSecret(ctx context.Context, rclient client.Client, cr, prevCR *vmv1beta1.VMAgent, childObject client.Object, ac *build.AssetsCache) error {
+func createOrUpdateScrapeConfig(ctx context.Context, rclient client.Client, cr, prevCR *vmv1beta1.VMAgent, childObject client.Object, ac *build.AssetsCache) error {
 	if cr.Spec.IngestOnlyMode {
 		return nil
 	}
@@ -211,7 +211,7 @@ func createOrUpdateConfigurationSecret(ctx context.Context, rclient client.Clien
 			if err = gzipConfig(&buf, generatedConfig); err != nil {
 				return fmt.Errorf("cannot gzip config for vmagent: %w", err)
 			}
-			secret.Data[vmagentGzippedFilename] = buf.Bytes()
+			secret.Data[scrapeGzippedFilename] = buf.Bytes()
 		}
 		secret.ObjectMeta = build.ResourceMeta(kind, cr)
 		secret.Annotations = map[string]string{
@@ -515,8 +515,6 @@ func generateConfig(
 
 	cfg = append(cfg, yaml.MapItem{Key: "global", Value: globalItems})
 
-	apiserverConfig := cr.Spec.APIServerConfig
-
 	var scrapeConfigs []yaml.MapSlice
 	var err error
 
@@ -528,9 +526,7 @@ func generateConfig(
 				cr,
 				ss,
 				ep, i,
-				apiserverConfig,
 				ac,
-				cr.Spec.VMAgentSecurityEnforcements,
 			)
 			if err != nil {
 				scrapeConfigs = scrapeConfigs[:scrapeConfigsLen]
@@ -551,9 +547,7 @@ func generateConfig(
 				ctx,
 				cr,
 				identifier, ep, i,
-				apiserverConfig,
 				ac,
-				cr.Spec.VMAgentSecurityEnforcements,
 			)
 			if err != nil {
 				scrapeConfigs = scrapeConfigs[:scrapeConfigsLen]
@@ -575,9 +569,7 @@ func generateConfig(
 			cr,
 			identifier,
 			idx,
-			apiserverConfig,
 			ac,
-			cr.Spec.VMAgentSecurityEnforcements,
 		)
 		idx++
 		if err != nil {
@@ -595,9 +587,7 @@ func generateConfig(
 			ctx,
 			cr,
 			identifier,
-			apiserverConfig,
 			ac,
-			cr.Spec.VMAgentSecurityEnforcements,
 		)
 		if err != nil {
 			return err
@@ -619,7 +609,6 @@ func generateConfig(
 				identifier,
 				ep, i,
 				ac,
-				cr.Spec.VMAgentSecurityEnforcements,
 			)
 			if err != nil {
 				scrapeConfigs = scrapeConfigs[:scrapeConfigsLen]
@@ -639,7 +628,6 @@ func generateConfig(
 			cr,
 			identifier,
 			ac,
-			cr.Spec.VMAgentSecurityEnforcements,
 		)
 		if err != nil {
 			return err
@@ -976,25 +964,33 @@ func enforceNamespaceLabel(relabelings []yaml.MapSlice, namespace, enforcedNames
 	})
 }
 
-func buildExternalLabels(p *vmv1beta1.VMAgent) yaml.MapSlice {
+func buildExternalLabels(cr *vmv1beta1.VMAgent) yaml.MapSlice {
 	m := map[string]string{}
+	sp := cr.Spec.CommonScrapeParams
 
 	// Use "prometheus" external label name by default if field is missing.
 	// in case of migration from prometheus to vmagent, it helps to have same labels
 	// Do not add external label if field is set to empty string.
 	prometheusExternalLabelName := "prometheus"
-	if p.Spec.VMAgentExternalLabelName != nil {
-		if *p.Spec.VMAgentExternalLabelName != "" {
-			prometheusExternalLabelName = *p.Spec.VMAgentExternalLabelName
+	var labelName *string
+	if sp.ExternalLabelName != nil {
+		labelName = sp.ExternalLabelName
+	} else if sp.VMAgentExternalLabelName != nil {
+		labelName = sp.VMAgentExternalLabelName
+	}
+	if labelName != nil {
+		if *labelName != "" {
+			prometheusExternalLabelName = *labelName
 		} else {
 			prometheusExternalLabelName = ""
 		}
 	}
 
 	if prometheusExternalLabelName != "" {
-		m[prometheusExternalLabelName] = fmt.Sprintf("%s/%s", p.Namespace, p.Name)
+		m[prometheusExternalLabelName] = fmt.Sprintf("%s/%s", cr.Namespace, cr.Name)
 	}
-	for n, v := range p.Spec.ExternalLabels {
+
+	for n, v := range sp.ExternalLabels {
 		m[n] = v
 	}
 	return stringMapToMapSlice(m)
@@ -1081,7 +1077,7 @@ func addSelectorToRelabelingFor(relabelings []yaml.MapSlice, typeName string, se
 	return relabelings
 }
 
-func addCommonScrapeParamsTo(cfg yaml.MapSlice, cs vmv1beta1.EndpointScrapeParams, se vmv1beta1.VMAgentSecurityEnforcements) yaml.MapSlice {
+func addCommonScrapeParamsTo(cfg yaml.MapSlice, cs vmv1beta1.EndpointScrapeParams, se vmv1beta1.CommonScrapeSecurityEnforcements) yaml.MapSlice {
 	hl := honorLabels(cs.HonorLabels, se.OverrideHonorLabels)
 	cfg = append(cfg, yaml.MapItem{
 		Key:   "honor_labels",
@@ -1136,7 +1132,7 @@ func addCommonScrapeParamsTo(cfg yaml.MapSlice, cs vmv1beta1.EndpointScrapeParam
 	return cfg
 }
 
-func addMetricRelabelingsTo(cfg yaml.MapSlice, src []*vmv1beta1.RelabelConfig, se vmv1beta1.VMAgentSecurityEnforcements) yaml.MapSlice {
+func addMetricRelabelingsTo(cfg yaml.MapSlice, src []*vmv1beta1.RelabelConfig, se vmv1beta1.CommonScrapeSecurityEnforcements) yaml.MapSlice {
 	if len(src) == 0 {
 		return cfg
 	}
