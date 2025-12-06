@@ -14,7 +14,7 @@ aliases:
 ## tip
 
 * FEATURE: [vmagent](https://docs.victoriametrics.com/operator/resources/vmagent/): support `namespace` parameter in `attach_metadata` section for all scrape configurations. See [#1654](https://github.com/VictoriaMetrics/operator/issues/1654).
-* FEATURE: [vmoperator](https://docs.victoriametrics.com/operator/): add `object_namespace` label to the `operator_alertmanager_bad_objects_count` and `operator_vmalert_bad_objects_count` metrics.
+* FEATURE: [vmoperator](https://docs.victoriametrics.com/operator/): use `operator_bad_objects_count` metric with `object_namespace` and `crd` labels to track invalid objects managed by VMAgent, VMAuth, VMAlert and VMAlertmanager. Removed old `operator_alertmanager_bad_objects_count` and `operator_vmalert_bad_objects_count` metrics.
 
 ## [v0.66.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.66.1)
 

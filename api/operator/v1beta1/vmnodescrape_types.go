@@ -87,6 +87,10 @@ func (cr *VMNodeScrape) GetStatusMetadata() *StatusMetadata {
 	return &cr.Status.StatusMetadata
 }
 
+func (cr *VMNodeScrape) AsKey(_ bool) string {
+	return cr.Namespace + "/" + cr.Name
+}
+
 func init() {
 	SchemeBuilder.Register(&VMNodeScrape{}, &VMNodeScrapeList{})
 }

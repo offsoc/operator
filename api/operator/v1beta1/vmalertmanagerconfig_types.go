@@ -1256,7 +1256,7 @@ func (hc *HTTPConfig) validate() error {
 	return nil
 }
 
-func (r *VMAlertmanagerConfig) AsKey() string {
+func (r *VMAlertmanagerConfig) AsKey(_ bool) string {
 	return fmt.Sprintf("%s/%s", r.Namespace, r.Name)
 }
 

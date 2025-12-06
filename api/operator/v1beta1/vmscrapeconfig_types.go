@@ -530,6 +530,10 @@ func (cr *VMScrapeConfig) Validate() error {
 	return cr.Spec.validate()
 }
 
+func (cr *VMScrapeConfig) AsKey(_ bool) string {
+	return cr.Namespace + "/" + cr.Name
+}
+
 // GetStatusMetadata implements reconcile.objectWithStatus interface
 func (cr *VMScrapeConfig) GetStatusMetadata() *StatusMetadata {
 	return &cr.Status.StatusMetadata

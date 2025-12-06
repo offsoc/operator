@@ -142,6 +142,10 @@ func (cr *VMPodScrape) Validate() error {
 	return nil
 }
 
+func (cr *VMPodScrape) AsKey(_ bool) string {
+	return cr.Namespace + "/" + cr.Name
+}
+
 // GetStatusMetadata implements reconcile.objectWithStatus interface
 func (cr *VMPodScrape) GetStatusMetadata() *StatusMetadata {
 	return &cr.Status.StatusMetadata
